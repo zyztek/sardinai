@@ -1,0 +1,465 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(uuid()) @db.Uuid
+  username        String   @unique
+  email           String   @unique
+  passwordHash    String   @map("password_hash")
+  fullName        String?  @map("full_name")
+  role            String   @default("user") @db.VarChar(20)
+  avatarUrl       String?  @map("avatar_url")
+  isActive        Boolean  @default(true) @map("is_active")
+  emailVerified   Boolean  @default(false) @map("email_verified")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  lastLogin       DateTime? @map("last_login") @db.Timestamptz(6)
+  preferences     Json?    @default("{}")
+  metadata        Json?    @default("{}")
+
+  // Relations
+  sessions        Session[]
+  userDevices     UserDevice[]
+  sardineReports  SardineReport[]
+  fishingRoutes   FishingRoute[]
+  fishingSessions FishingSession[]
+  mlModels        MLModel[]
+  systemConfig    SystemConfig[]
+  notifications   UserNotification[]
+  systemLogs      SystemLog[]
+
+  @@map("users")
+}
+
+model Session {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  token      String   @unique
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  ipAddress  String?  @map("ip_address") @db.Inet
+  userAgent  String?  @map("user_agent")
+  isActive   Boolean  @default(true) @map("is_active")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model UserDevice {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  deviceType  String   @map("device_type") @db.VarChar(50)
+  deviceName  String?  @map("device_name") @db.VarChar(100)
+  deviceId    String   @map("device_id") @db.VarChar(100)
+  pushToken   String?  @map("push_token")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  lastUsed    DateTime @default(now()) @map("last_used") @db.Timestamptz(6)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_devices")
+}
+
+model OceanZone {
+  id             String    @id @default(uuid()) @db.Uuid
+  name           String    @db.VarChar(100)
+  description    String?
+  geometry       String    @db.Geography(Polygon, 4326)
+  zoneType       String    @map("zone_type") @db.VarChar(50)
+  depthMin       Float?    @map("depth_min") @db.Decimal(10, 2)
+  depthMax       Float?    @map("depth_max") @db.Decimal(10, 2)
+  temperatureMin Float?    @map("temperature_min") @db.Decimal(5, 2)
+  temperatureMax Float?    @map("temperature_max") @db.Decimal(5, 2)
+  salinityMin    Float?    @map("salinity_min") @db.Decimal(5, 2)
+  salinityMax    Float?    @map("salinity_max") @db.Decimal(5, 2)
+  isActive       Boolean   @default(true) @map("is_active")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  metadata       Json?     @default("{}")
+
+  // Relations
+  oceanographicData OceanographicData[]
+  sardinePredictions SardinePrediction[]
+  sardineReports     SardineReport[]
+  alerts             Alert[]
+
+  @@map("ocean_zones")
+}
+
+model OceanographicData {
+  id                  String     @id @default(uuid()) @db.Uuid
+  location            String     @db.Geography(Point, 4326)
+  zoneId              String?    @map("zone_id") @db.Uuid
+  timestamp           DateTime   @map("timestamp") @db.Timestamptz(6)
+  dataSource          String     @map("data_source") @db.VarChar(50)
+  temperatureSurface  Float?     @map("temperature_surface") @db.Decimal(5, 2)
+  temperatureSubsurface Float?   @map("temperature_subsurface") @db.Decimal(5, 2)
+  salinity             Float?     @db.Decimal(5, 2)
+  chlorophyll          Float?     @db.Decimal(8, 6)
+  dissolvedOxygen     Float?     @map("dissolved_oxygen") @db.Decimal(6, 4)
+  ph                  Float?     @db.Decimal(4, 2)
+  turbidity            Float?     @db.Decimal(6, 4)
+  currentSpeed        Float?     @map("current_speed") @db.Decimal(5, 2)
+  currentDirection    Int?       @map("current_direction")
+  waveHeight          Float?     @map("wave_height") @db.Decimal(4, 2)
+  wavePeriod          Float?     @map("wave_period") @db.Decimal(4, 1)
+  waveDirection       Int?       @map("wave_direction")
+  windSpeed           Float?     @map("wind_speed") @db.Decimal(5, 2)
+  windDirection       Int?       @map("wind_direction")
+  atmosphericPressure Float?     @map("atmospheric_pressure") @db.Decimal(6, 2)
+  precipitation       Float?     @db.Decimal(5, 2)
+  visibility          Float?     @db.Decimal(5, 2)
+  metadata            Json?      @default("{}")
+  createdAt           DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  zone OceanZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+
+  @@map("oceanographic_data")
+}
+
+model SardinePrediction {
+  id               String     @id @default(uuid()) @db.Uuid
+  location         String     @db.Geography(Point, 4326)
+  zoneId           String?    @map("zone_id") @db.Uuid
+  predictionDate   DateTime   @map("prediction_date") @db.Timestamptz(6)
+  predictionModel  String     @map("prediction_model") @db.VarChar(50)
+  probability      Float      @db.Decimal(5, 4)
+  confidenceLower  Float?     @map("confidence_lower") @db.Decimal(5, 4)
+  confidenceUpper  Float?     @map("confidence_upper") @db.Decimal(5, 4)
+  estimatedDensity Float?     @map("estimated_density") @db.Decimal(10, 2)
+  estimatedDepthMin Float?    @map("estimated_depth_min") @db.Decimal(10, 2)
+  estimatedDepthMax Float?    @map("estimated_depth_max") @db.Decimal(10, 2)
+  schoolSize       String?    @map("school_size") @db.VarChar(20)
+  migrationDirection String?  @map("migration_direction") @db.VarChar(20)
+  factors          Json?      @default("{}")
+  metadata         Json?      @default("{}")
+  createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt        DateTime?  @map("expires_at") @db.Timestamptz(6)
+
+  // Relations
+  zone OceanZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+
+  @@map("sardine_predictions")
+}
+
+model SardineReport {
+  id                 String     @id @default(uuid()) @db.Uuid
+  userId             String     @map("user_id") @db.Uuid
+  location           String     @db.Geography(Point, 4326)
+  zoneId             String?    @map("zone_id") @db.Uuid
+  reportDate         DateTime   @map("report_date") @db.Timestamptz(6)
+  reportType         String     @map("report_type") @db.VarChar(20)
+  verificationStatus String     @map("verification_status") @default("pending") @db.VarChar(20)
+  estimatedQuantity  Int?
+  estimatedSize      String?    @map("estimated_size") @db.VarChar(20)
+  depth              Float?     @db.Decimal(10, 2)
+  temperature        Float?     @db.Decimal(5, 2)
+  salinity           Float?     @db.Decimal(5, 2)
+  currentSpeed       Float?     @map("current_speed") @db.Decimal(5, 2)
+  currentDirection   Int?       @map("current_direction")
+  weatherConditions  String?    @map("weather_conditions") @db.VarChar(100)
+  waterClarity       String?    @map("water_clarity") @db.VarChar(50)
+  fishingMethod      String?    @map("fishing_method") @db.VarChar(50)
+  catchWeight        Float?     @map("catch_weight") @db.Decimal(10, 2)
+  images             String[]   @db.Text[]
+  notes              String?
+  verifiedBy         String?    @map("verified_by") @db.Uuid
+  verifiedAt         DateTime?  @map("verified_at") @db.Timestamptz(6)
+  metadata           Json?      @default("{}")
+  createdAt          DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  zone      OceanZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  verifiedByUser User? @relation("VerifiedByUser", fields: [verifiedBy], references: [id])
+
+  @@map("sardine_reports")
+}
+
+model VesselTraffic {
+  id           String    @id @default(uuid()) @db.Uuid
+  mmsi         BigInt?
+  vesselName   String?   @map("vessel_name") @db.VarChar(100)
+  vesselType   String?   @map("vessel_type") @db.VarChar(50)
+  length       Float?    @db.Decimal(6, 2)
+  width        Float?    @db.Decimal(6, 2)
+  draft        Float?    @db.Decimal(6, 2)
+  location     String    @db.Geography(Point, 4326)
+  course       Int?
+  speed        Float?    @db.Decimal(5, 2)
+  heading      Int?
+  timestamp    DateTime  @map("timestamp") @db.Timestamptz(6)
+  destination  String?   @db.VarChar(100)
+  status       String?   @db.VarChar(20)
+  dataSource   String    @map("data_source") @db.VarChar(20)
+  metadata     Json?     @default("{}")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("vessel_traffic")
+}
+
+model Alert {
+  id            String     @id @default(uuid()) @db.Uuid
+  title         String     @db.VarChar(200)
+  message       String
+  alertType     String     @map("alert_type") @db.VarChar(50)
+  severity      String     @db.VarChar(20)
+  location      String?    @db.Geography(Point, 4326)
+  zoneId        String?    @map("zone_id") @db.Uuid
+  isActive      Boolean    @default(true) @map("is_active")
+  expiresAt     DateTime?  @map("expires_at") @db.Timestamptz(6)
+  acknowledgedBy String?   @map("acknowledged_by") @db.Uuid
+  acknowledgedAt DateTime?  @map("acknowledged_at") @db.Timestamptz(6)
+  metadata      Json?      @default("{}")
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  zone           OceanZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  acknowledgedBy User?      @relation("AcknowledgedByUser", fields: [acknowledgedBy], references: [id])
+  notifications  UserNotification[]
+
+  @@map("alerts")
+}
+
+model UserNotification {
+  id             String     @id @default(uuid()) @db.Uuid
+  userId         String     @map("user_id") @db.Uuid
+  alertId        String?    @map("alert_id") @db.Uuid
+  title          String     @db.VarChar(200)
+  message        String
+  notificationType String   @map("notification_type") @db.VarChar(50)
+  isRead         Boolean    @default(false) @map("is_read")
+  isDelivered    Boolean    @default(false) @map("is_delivered")
+  deliveryMethod String     @map("delivery_method") @default("app") @db.VarChar(20)
+  scheduledFor   DateTime?  @map("scheduled_for") @db.Timestamptz(6)
+  deliveredAt    DateTime?  @map("delivered_at") @db.Timestamptz(6)
+  readAt         DateTime?  @map("read_at") @db.Timestamptz(6)
+  metadata       Json?      @default("{}")
+  createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alert Alert? @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  @@map("user_notifications")
+}
+
+model FishingRoute {
+  id                String     @id @default(uuid()) @db.Uuid
+  userId            String     @map("user_id") @db.Uuid
+  name              String     @db.VarChar(100)
+  description       String?
+  routeData         String     @map("route_data") @db.Geography(LineString, 4326)
+  waypoints         Json?      @default("[]")
+  distance          Float?     @db.Decimal(10, 2)
+  estimatedDuration Int?       @map("estimated_duration")
+  difficulty        Int?       @db.SmallInt
+  seasonality       String?    @db.VarChar(50)
+  isPublic          Boolean    @default(false) @map("is_public")
+  isActive          Boolean    @default(true) @map("is_active")
+  tags              String[]   @db.Text[]
+  metadata          Json?      @default("{}")
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fishingSessions FishingSession[]
+
+  @@map("fishing_routes")
+}
+
+model FishingSession {
+  id              String     @id @default(uuid()) @db.Uuid
+  userId          String     @map("user_id") @db.Uuid
+  routeId         String?    @map("route_id") @db.Uuid
+  vesselName      String?    @map("vessel_name") @db.VarChar(100)
+  vesselType      String?    @map("vessel_type") @db.VarChar(50)
+  startTime       DateTime   @map("start_time") @db.Timestamptz(6)
+  endTime         DateTime?  @map("end_time") @db.Timestamptz(6)
+  startLocation   String     @map("start_location") @db.Geography(Point, 4326)
+  endLocation     String?    @map("end_location") @db.Geography(Point, 4326)
+  actualRoute     String?    @map("actual_route") @db.Geography(LineString, 4326)
+  distanceCovered Float?     @map("distance_covered") @db.Decimal(10, 2)
+  fuelConsumed    Float?     @map("fuel_consumed") @db.Decimal(10, 2)
+  catchData       Json?      @default("{}") @map("catch_data")
+  weatherConditions Json?    @default("{}") @map("weather_conditions")
+  notes           String?
+  isCompleted     Boolean    @default(false) @map("is_completed")
+  metadata        Json?      @default("{}")
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  user  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  route FishingRoute? @relation(fields: [routeId], references: [id], onDelete: SetNull)
+
+  @@map("fishing_sessions")
+}
+
+model BathymetryData {
+  id          String    @id @default(uuid()) @db.Uuid
+  location    String    @db.Geography(Point, 4326)
+  depth       Float     @db.Decimal(10, 2)
+  uncertainty Float?    @db.Decimal(10, 2)
+  dataSource  String    @map("data_source") @db.VarChar(50)
+  resolution  Float?    @db.Decimal(10, 2)
+  timestamp   DateTime  @default(now()) @map("timestamp") @db.Timestamptz(6)
+  metadata    Json?     @default("{}")
+
+  @@map("bathymetry_data")
+}
+
+model SatelliteData {
+  id              String     @id @default(uuid()) @db.Uuid
+  satelliteName   String     @map("satellite_name") @db.VarChar(50)
+  sensorType      String     @map("sensor_type") @db.VarChar(50)
+  acquisitionTime DateTime   @map("acquisition_time") @db.Timestamptz(6)
+  processingTime  DateTime   @default(now()) @map("processing_time") @db.Timestamptz(6)
+  bounds          String     @db.Geography(Polygon, 4326)
+  resolution      Float?     @db.Decimal(10, 2)
+  dataType        String     @map("data_type") @db.VarChar(50)
+  fileUrl         String     @map("file_url") @db.Text
+  thumbnailUrl    String?    @map("thumbnail_url") @db.Text
+  metadata        Json?      @default("{}")
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("satellite_data")
+}
+
+model MLModel {
+  id               String     @id @default(uuid()) @db.Uuid
+  name             String     @db.VarChar(100)
+  version          String     @db.VarChar(20)
+  modelType        String     @map("model_type") @db.VarChar(50)
+  description      String?
+  filePath         String     @map("file_path") @db.Text
+  fileSize         BigInt?    @map("file_size")
+  accuracy         Float?     @db.Decimal(5, 4)
+  precisionScore   Float?     @map("precision_score") @db.Decimal(5, 4)
+  recallScore      Float?     @map("recall_score") @db.Decimal(5, 4)
+  f1Score          Float?     @map("f1_score") @db.Decimal(5, 4)
+  trainingDataSize Int?       @map("training_data_size")
+  validationDataSize Int?     @map("validation_data_size")
+  features         Json?      @default("{}")
+  hyperparameters  Json?      @default("{}")
+  isActive         Boolean    @default(true) @map("is_active")
+  isProduction     Boolean    @default(false) @map("is_production")
+  createdBy        String?    @map("created_by") @db.Uuid
+  createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  createdByUser   User               @relation("CreatedByUser", fields: [createdBy], references: [id])
+  executions      MLModelExecution[]
+
+  @@map("ml_models")
+}
+
+model MLModelExecution {
+  id            String     @id @default(uuid()) @db.Uuid
+  modelId       String     @map("model_id") @db.Uuid
+  executionType String     @map("execution_type") @db.VarChar(20)
+  inputData     Json       @map("input_data")
+  outputData    Json?      @map("output_data")
+  executionTime Int?       @map("execution_time")
+  status        String     @db.VarChar(20)
+  errorMessage  String?    @map("error_message")
+  executedBy    String?    @map("executed_by") @db.Uuid
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  completedAt   DateTime?  @map("completed_at") @db.Timestamptz(6)
+
+  // Relations
+  model MLModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  executedByUser User? @relation("ExecutedByUser", fields: [executedBy], references: [id])
+
+  @@map("ml_model_executions")
+}
+
+model SystemLog {
+  id         String     @id @default(uuid()) @db.Uuid
+  level      String     @db.VarChar(10)
+  message    String
+  component  String?    @db.VarChar(50)
+  userId     String?    @map("user_id") @db.Uuid
+  requestId  String?    @map("request_id") @db.Uuid
+  ipAddress  String?    @map("ip_address") @db.Inet
+  userAgent  String?    @map("user_agent") @db.Text
+  metadata   Json?      @default("{}")
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("system_logs")
+}
+
+model SystemMetrics {
+  id          String     @id @default(uuid()) @db.Uuid
+  metricName  String     @map("metric_name") @db.VarChar(100)
+  metricValue Float      @map("metric_value") @db.Decimal(20, 10)
+  metricType  String     @map("metric_type") @db.VarChar(20)
+  tags        Json?      @default("{}")
+  timestamp   DateTime   @default(now()) @map("timestamp") @db.Timestamptz(6)
+  metadata    Json?      @default("{}")
+
+  @@map("system_metrics")
+}
+
+model SystemConfig {
+  id          String     @id @default(uuid()) @db.Uuid
+  configKey   String     @unique @map("config_key") @db.VarChar(100)
+  configValue Json       @map("config_value")
+  description String?
+  isSensitive Boolean    @default(false) @map("is_sensitive")
+  environment String    @default("all") @db.VarChar(20)
+  version     Int        @default(1)
+  createdBy  String?    @map("created_by") @db.Uuid
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  // Relations
+  createdByUser User @relation(fields: [createdBy], references: [id])
+
+  @@map("system_config")
+}
+
+// Relations for User model
+relation VerifiedByUser {
+  fields [verifiedBy]
+  references [id]
+  model User
+}
+
+relation AcknowledgedByUser {
+  fields [acknowledgedBy]
+  references [id]
+  model User
+}
+
+relation CreatedByUser {
+  fields [createdBy]
+  references [id]
+  model User
+}
+
+relation ExecutedByUser {
+  fields [executedBy]
+  references [id]
+  model User
+}
