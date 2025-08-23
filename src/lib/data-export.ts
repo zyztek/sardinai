@@ -237,7 +237,7 @@ class DataExportService {
   }
 
   private generateMockOceanographicData(dateRange: { start: Date; end: Date }): any[] {
-    const data = [];
+    const data: any[] = [];
     const days = Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24));
     
     for (let i = 0; i < days; i++) {
@@ -263,7 +263,7 @@ class DataExportService {
   }
 
   private generateMockPredictionData(dateRange: { start: Date; end: Date }): any[] {
-    const data = [];
+    const data: any[] = [];
     const days = Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24));
     
     for (let i = 0; i < days; i++) {
@@ -288,7 +288,7 @@ class DataExportService {
   }
 
   private generateMockVesselData(dateRange: { start: Date; end: Date }): any[] {
-    const data = [];
+    const data: any[] = [];
     const days = Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24));
     const vesselTypes = ['fishing', 'cargo', 'passenger', 'military'];
     
@@ -315,7 +315,7 @@ class DataExportService {
   }
 
   private generateMockAlertData(dateRange: { start: Date; end: Date }): any[] {
-    const data = [];
+    const data: any[] = [];
     const days = Math.ceil((dateRange.end.getTime() - dateRange.start.getTime()) / (1000 * 60 * 60 * 24));
     const alertTypes = ['high_probability', 'breeding_season', 'weather_warning', 'sustainability_alert'];
     const severities = ['low', 'medium', 'high', 'critical'];
@@ -730,8 +730,8 @@ class DataExportService {
     const sizes = this.exportHistory.filter(e => e.size).map(e => e.size!);
     const averageSize = sizes.length > 0 ? sizes.reduce((a, b) => a + b, 0) / sizes.length : 0;
     
-    const formats = this.exportHistory.reduce((acc, export) => {
-      const format = export.filename?.split('.').pop() || 'unknown';
+    const formats = this.exportHistory.reduce((acc, exportItem) => {
+      const format = exportItem.filename?.split('.').pop() || 'unknown';
       acc[format] = (acc[format] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);

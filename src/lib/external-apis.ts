@@ -1,7 +1,7 @@
 // Servicio de conexión a APIs externas para SARDIN-AI
 // Este servicio maneja la conexión con NOAA, CICESE y otras fuentes de datos oceanográficos
 
-import { ZAI } from 'z-ai-web-dev-sdk';
+import ZAI from 'z-ai-web-dev-sdk';
 
 export interface OceanographicDataPoint {
   latitude: number;
@@ -365,7 +365,7 @@ class ExternalAPIService {
           title: alertTypes[Math.floor(Math.random() * alertTypes.length)],
           description: 'Marine weather warning for the area',
           severity: severities[Math.floor(Math.random() * severities.length)],
-          bounds,
+          area: bounds,
           valid_from: new Date().toISOString(),
           valid_until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
         });

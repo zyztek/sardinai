@@ -481,7 +481,7 @@ class AuthService {
     const state = crypto.randomBytes(32).toString('hex');
     const params = new URLSearchParams({
       client_id: oauthProvider.client_id,
-      redirect_uri,
+      redirect_uri: redirectUri,
       response_type: 'code',
       scope: oauthProvider.scopes.join(' '),
       state
@@ -514,7 +514,7 @@ class AuthService {
         body: new URLSearchParams({
           grant_type: 'authorization_code',
           code,
-          redirect_uri,
+          redirect_uri: redirectUri,
           client_id: oauthProvider.client_id,
           client_secret: oauthProvider.client_secret
         })

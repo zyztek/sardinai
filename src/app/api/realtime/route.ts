@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { WebSocketServer } from 'ws';
-import { createServer } from 'http';
 
-// WebSocket server for real-time data streaming
-let wss: WebSocketServer | null = null;
-
-// Store connected clients
-const clients = new Set<WebSocket>();
+// Store connected clients (will be managed by Socket.IO server)
+const clients = new Set<any>();
 
 // Data generators for different types of real-time data
 class DataGenerators {
@@ -158,109 +153,29 @@ class DataGenerators {
     return messages[Math.floor(Math.random() * messages.length)];
   }
 
-  private broadcast(data: any) {
-    const message = JSON.stringify(data);
-    
-    clients.forEach(client => {
-      if (client.readyState === WebSocket.OPEN) {
-        try {
-          client.send(message);
-        } catch (error) {
-          console.error('Error sending message to client:', error);
-          clients.delete(client);
-        }
-      }
-    });
+  broadcast(data: any) {
+    // This will be handled by Socket.IO server
+    // For now, just log the data
+    console.log('Broadcasting data:', data.type, 'at', data.timestamp);
+  }
+
+  isRunning(): boolean {
+    return this.intervals.size > 0;
   }
 }
 
 const dataGenerators = new DataGenerators();
 
-// Initialize WebSocket server
-function initializeWebSocketServer() {
-  if (wss) return;
-
-  const server = createServer();
-  wss = new WebSocketServer({ server });
-
-  wss.on('connection', (ws: WebSocket) => {
-    console.log('New WebSocket client connected');
-    clients.add(ws);
-
-    // Send welcome message
-    ws.send(JSON.stringify({
-      type: 'system',
-      timestamp: new Date().toISOString(),
-      data: {
-        message: 'Connected to SARDIN-AI real-time data stream',
-        connectionId: Date.now().toString(),
-      }
-    }));
-
-    // Handle incoming messages
-    ws.on('message', (message: string) => {
-      try {
-        const data = JSON.parse(message);
-        
-        // Handle heartbeat
-        if (data.type === 'heartbeat') {
-          ws.send(JSON.stringify({
-            type: 'heartbeat_response',
-            timestamp: new Date().toISOString(),
-            data: { received: data.timestamp }
-          }));
-        }
-        
-        // Handle client subscriptions
-        if (data.type === 'subscribe') {
-          console.log(`Client subscribed to: ${data.data.types}`);
-        }
-        
-        // Handle client unsubscriptions
-        if (data.type === 'unsubscribe') {
-          console.log(`Client unsubscribed from: ${data.data.types}`);
-        }
-        
-      } catch (error) {
-        console.error('Error parsing client message:', error);
-      }
-    });
-
-    // Handle client disconnect
-    ws.on('close', () => {
-      console.log('WebSocket client disconnected');
-      clients.delete(ws);
-    });
-
-    // Handle errors
-    ws.on('error', (error) => {
-      console.error('WebSocket error:', error);
-      clients.delete(ws);
-    });
-  });
-
-  // Start generating data when first client connects
-  if (clients.size === 1) {
+// Initialize data generators (Socket.IO server handles connections)
+function initializeDataGenerators() {
+  if (!dataGenerators.isRunning()) {
     dataGenerators.startGenerating();
   }
-
-  // Stop generating data when no clients are connected
-  wss.on('close', () => {
-    if (clients.size === 0) {
-      dataGenerators.stopGenerating();
-    }
-  });
-
-  server.listen(3001, () => {
-    console.log('WebSocket server running on port 3001');
-  });
 }
 
 export async function GET(request: NextRequest) {
-  // Initialize WebSocket server if not already running
-  if (!wss) {
-    initializeWebSocketServer();
-  }
+  // Initialize data generators if not already running
+  initializeDataGenerators();
 
   return NextResponse.json({
     message: 'WebSocket server initialized',
@@ -322,15 +237,9 @@ export async function POST(request: NextRequest) {
 
 // Cleanup on module unload
 process.on('SIGTERM', () => {
-  if (wss) {
-    wss.close();
-    dataGenerators.stopGenerating();
-  }
+  dataGenerators.stopGenerating();
 });
 
 process.on('SIGINT', () => {
-  if (wss) {
-    wss.close();
-    dataGenerators.stopGenerating();
-  }
+  dataGenerators.stopGenerating();
 });

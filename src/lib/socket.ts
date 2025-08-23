@@ -14,16 +14,44 @@ export const setupSocket = (io: Server) => {
       });
     });
 
+    // Handle real-time data subscriptions
+    socket.on('subscribe', (data: { types: string[] }) => {
+      console.log(`Client ${socket.id} subscribed to:`, data.types);
+      socket.join('realtime-data');
+      
+      // Send confirmation
+      socket.emit('subscription-confirmed', {
+        types: data.types,
+        timestamp: new Date().toISOString(),
+      });
+    });
+
+    socket.on('unsubscribe', (data: { types: string[] }) => {
+      console.log(`Client ${socket.id} unsubscribed from:`, data.types);
+      socket.leave('realtime-data');
+    });
+
+    // Handle heartbeat
+    socket.on('heartbeat', (data: { timestamp: string }) => {
+      socket.emit('heartbeat_response', {
+        received: data.timestamp,
+        timestamp: new Date().toISOString(),
+      });
+    });
+
     // Handle disconnect
     socket.on('disconnect', () => {
       console.log('Client disconnected:', socket.id);
     });
 
     // Send welcome message
-    socket.emit('message', {
-      text: 'Welcome to WebSocket Echo Server!',
-      senderId: 'system',
+    socket.emit('system', {
+      message: 'Connected to SARDIN-AI real-time data stream',
+      connectionId: socket.id,
       timestamp: new Date().toISOString(),
     });
   });
+
+  // Export io instance for use in other modules
+  (global as any).socketIO = io;
 };

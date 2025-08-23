@@ -3,7 +3,7 @@
  * Handles live data streaming for oceanographic updates, sardine predictions, and vessel tracking
  */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 export interface RealtimeData {
   type: 'oceanographic' | 'prediction' | 'vessel' | 'alert' | 'system';

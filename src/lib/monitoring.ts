@@ -4,6 +4,7 @@
  */
 
 import { performance } from 'perf_hooks';
+import { useEffect } from 'react';
 
 export interface LogEntry {
   timestamp: string;
