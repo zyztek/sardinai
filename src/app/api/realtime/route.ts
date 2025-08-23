@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Server } from 'ws';
+import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 
 // WebSocket server for real-time data streaming
-let wss: Server | null = null;
+let wss: WebSocketServer | null = null;
 
 // Store connected clients
 const clients = new Set<WebSocket>();
@@ -181,7 +181,7 @@ function initializeWebSocketServer() {
   if (wss) return;
 
   const server = createServer();
-  wss = new Server({ server });
+  wss = new WebSocketServer({ server });
 
   wss.on('connection', (ws: WebSocket) => {
     console.log('New WebSocket client connected');
