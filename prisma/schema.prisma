@@ -36,6 +36,10 @@ model User {
   systemConfig    SystemConfig[]
   notifications   UserNotification[]
   systemLogs      SystemLog[]
+  verifiedReports SardineReport[] @relation("VerifiedByUser")
+  acknowledgedAlerts Alert[] @relation("AcknowledgedByUser")
+  createdModels   MLModel[] @relation("CreatedByUser")
+  executedModels  MLModelExecution[] @relation("ExecutedByUser")
 
   @@map("users")
 }
@@ -77,7 +81,7 @@ model OceanZone {
   id             String    @id @default(uuid()) @db.Uuid
   name           String    @db.VarChar(100)
   description    String?
-  geometry       String    @db.Geography(Polygon, 4326)
+  geometry       String    @db.Text
   zoneType       String    @map("zone_type") @db.VarChar(50)
   depthMin       Float?    @map("depth_min") @db.Decimal(10, 2)
   depthMax       Float?    @map("depth_max") @db.Decimal(10, 2)
@@ -101,7 +105,7 @@ model OceanZone {
 
 model OceanographicData {
   id                  String     @id @default(uuid()) @db.Uuid
-  location            String     @db.Geography(Point, 4326)
+  location            String     @db.Text
   zoneId              String?    @map("zone_id") @db.Uuid
   timestamp           DateTime   @map("timestamp") @db.Timestamptz(6)
   dataSource          String     @map("data_source") @db.VarChar(50)
@@ -133,7 +137,7 @@ model OceanographicData {
 
 model SardinePrediction {
   id               String     @id @default(uuid()) @db.Uuid
-  location         String     @db.Geography(Point, 4326)
+  location         String     @db.Text
   zoneId           String?    @map("zone_id") @db.Uuid
   predictionDate   DateTime   @map("prediction_date") @db.Timestamptz(6)
   predictionModel  String     @map("prediction_model") @db.VarChar(50)
@@ -159,7 +163,7 @@ model SardinePrediction {
 model SardineReport {
   id                 String     @id @default(uuid()) @db.Uuid
   userId             String     @map("user_id") @db.Uuid
-  location           String     @db.Geography(Point, 4326)
+  location           String     @db.Text
   zoneId             String?    @map("zone_id") @db.Uuid
   reportDate         DateTime   @map("report_date") @db.Timestamptz(6)
   reportType         String     @map("report_type") @db.VarChar(20)
@@ -175,7 +179,7 @@ model SardineReport {
   waterClarity       String?    @map("water_clarity") @db.VarChar(50)
   fishingMethod      String?    @map("fishing_method") @db.VarChar(50)
   catchWeight        Float?     @map("catch_weight") @db.Decimal(10, 2)
-  images             String[]   @db.Text[]
+  images             String[]
   notes              String?
   verifiedBy         String?    @map("verified_by") @db.Uuid
   verifiedAt         DateTime?  @map("verified_at") @db.Timestamptz(6)
@@ -199,7 +203,7 @@ model VesselTraffic {
   length       Float?    @db.Decimal(6, 2)
   width        Float?    @db.Decimal(6, 2)
   draft        Float?    @db.Decimal(6, 2)
-  location     String    @db.Geography(Point, 4326)
+  location     String    @db.Text
   course       Int?
   speed        Float?    @db.Decimal(5, 2)
   heading      Int?
@@ -219,7 +223,7 @@ model Alert {
   message       String
   alertType     String     @map("alert_type") @db.VarChar(50)
   severity      String     @db.VarChar(20)
-  location      String?    @db.Geography(Point, 4326)
+  location      String?    @db.Text
   zoneId        String?    @map("zone_id") @db.Uuid
   isActive      Boolean    @default(true) @map("is_active")
   expiresAt     DateTime?  @map("expires_at") @db.Timestamptz(6)
@@ -230,7 +234,7 @@ model Alert {
 
   // Relations
   zone           OceanZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
-  acknowledgedBy User?      @relation("AcknowledgedByUser", fields: [acknowledgedBy], references: [id])
+  acknowledgedByUser User?  @relation("AcknowledgedByUser", fields: [acknowledgedBy], references: [id])
   notifications  UserNotification[]
 
   @@map("alerts")
@@ -264,7 +268,7 @@ model FishingRoute {
   userId            String     @map("user_id") @db.Uuid
   name              String     @db.VarChar(100)
   description       String?
-  routeData         String     @map("route_data") @db.Geography(LineString, 4326)
+  routeData         String     @map("route_data") @db.Text
   waypoints         Json?      @default("[]")
   distance          Float?     @db.Decimal(10, 2)
   estimatedDuration Int?       @map("estimated_duration")
@@ -272,7 +276,7 @@ model FishingRoute {
   seasonality       String?    @db.VarChar(50)
   isPublic          Boolean    @default(false) @map("is_public")
   isActive          Boolean    @default(true) @map("is_active")
-  tags              String[]   @db.Text[]
+  tags              String[]
   metadata          Json?      @default("{}")
   createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
@@ -292,9 +296,9 @@ model FishingSession {
   vesselType      String?    @map("vessel_type") @db.VarChar(50)
   startTime       DateTime   @map("start_time") @db.Timestamptz(6)
   endTime         DateTime?  @map("end_time") @db.Timestamptz(6)
-  startLocation   String     @map("start_location") @db.Geography(Point, 4326)
-  endLocation     String?    @map("end_location") @db.Geography(Point, 4326)
-  actualRoute     String?    @map("actual_route") @db.Geography(LineString, 4326)
+  startLocation   String     @map("start_location") @db.Text
+  endLocation     String?    @map("end_location") @db.Text
+  actualRoute     String?    @map("actual_route") @db.Text
   distanceCovered Float?     @map("distance_covered") @db.Decimal(10, 2)
   fuelConsumed    Float?     @map("fuel_consumed") @db.Decimal(10, 2)
   catchData       Json?      @default("{}") @map("catch_data")
@@ -314,7 +318,7 @@ model FishingSession {
 
 model BathymetryData {
   id          String    @id @default(uuid()) @db.Uuid
-  location    String    @db.Geography(Point, 4326)
+  location    String    @db.Text
   depth       Float     @db.Decimal(10, 2)
   uncertainty Float?    @db.Decimal(10, 2)
   dataSource  String    @map("data_source") @db.VarChar(50)
@@ -331,7 +335,7 @@ model SatelliteData {
   sensorType      String     @map("sensor_type") @db.VarChar(50)
   acquisitionTime DateTime   @map("acquisition_time") @db.Timestamptz(6)
   processingTime  DateTime   @default(now()) @map("processing_time") @db.Timestamptz(6)
-  bounds          String     @db.Geography(Polygon, 4326)
+  bounds          String     @db.Text
   resolution      Float?     @db.Decimal(10, 2)
   dataType        String     @map("data_type") @db.VarChar(50)
   fileUrl         String     @map("file_url") @db.Text
@@ -365,7 +369,7 @@ model MLModel {
   updatedAt        DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   // Relations
-  createdByUser   User               @relation("CreatedByUser", fields: [createdBy], references: [id])
+  createdByUser   User?              @relation("CreatedByUser", fields: [createdBy], references: [id])
   executions      MLModelExecution[]
 
   @@map("ml_models")
@@ -434,32 +438,7 @@ model SystemConfig {
   updatedAt   DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   // Relations
-  createdByUser User @relation(fields: [createdBy], references: [id])
+  createdByUser User? @relation(fields: [createdBy], references: [id])
 
   @@map("system_config")
-}
-
-// Relations for User model
-relation VerifiedByUser {
-  fields [verifiedBy]
-  references [id]
-  model User
-}
-
-relation AcknowledgedByUser {
-  fields [acknowledgedBy]
-  references [id]
-  model User
-}
-
-relation CreatedByUser {
-  fields [createdBy]
-  references [id]
-  model User
-}
-
-relation ExecutedByUser {
-  fields [executedBy]
-  references [id]
-  model User
 }
