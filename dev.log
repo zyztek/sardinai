@@ -11,7 +11,74 @@
  ✓ Compiled /api/realtime in 219ms (365 modules)
  GET /api/realtime 200 in 317ms
 Broadcasting data: oceanographic at 2025-08-23T00:36:27.225Z
-s
- ✓ Compiled /api/realtime in 219ms (365 modules)
- GET /api/realtime 200 in 317ms
-Broadcasting data: oceanographic at 2025-08-23T00:36:27.225Z
+Broadcasting data: prediction at 2025-08-23T00:36:32.230Z
+Broadcasting data: oceanographic at 2025-08-23T00:36:32.231Z
+Broadcasting data: vessel at 2025-08-23T00:36:37.227Z
+Broadcasting data: oceanographic at 2025-08-23T00:36:37.230Z
+Broadcasting data: prediction at 2025-08-23T00:36:42.234Z
+Broadcasting data: oceanographic at 2025-08-23T00:36:42.235Z
+Broadcasting data: oceanographic at 2025-08-23T00:36:47.238Z
+Broadcasting data: vessel at 2025-08-23T00:36:52.226Z
+Broadcasting data: prediction at 2025-08-23T00:36:52.235Z
+Broadcasting data: oceanographic at 2025-08-23T00:36:52.238Z
+Broadcasting data: oceanographic at 2025-08-23T00:36:57.239Z
+Broadcasting data: prediction at 2025-08-23T00:37:02.238Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:02.238Z
+Broadcasting data: vessel at 2025-08-23T00:37:07.227Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:07.239Z
+Broadcasting data: prediction at 2025-08-23T00:37:12.242Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:12.242Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:17.245Z
+Broadcasting data: vessel at 2025-08-23T00:37:22.228Z
+Broadcasting data: prediction at 2025-08-23T00:37:22.242Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:22.246Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:27.246Z
+Broadcasting data: prediction at 2025-08-23T00:37:32.247Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:32.247Z
+ GET /api/health 200 in 11ms
+ GET /api/realtime 200 in 6ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.7s (785 modules)
+ GET / 200 in 2952ms
+Broadcasting data: vessel at 2025-08-23T00:37:37.228Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:37.247Z
+Broadcasting data: prediction at 2025-08-23T00:37:42.253Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:42.253Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:47.254Z
+Broadcasting data: vessel at 2025-08-23T00:37:52.230Z
+Broadcasting data: alert at 2025-08-23T00:37:52.230Z
+Broadcasting data: prediction at 2025-08-23T00:37:52.251Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:52.253Z
+Broadcasting data: oceanographic at 2025-08-23T00:37:57.255Z
+Broadcasting data: prediction at 2025-08-23T00:38:02.254Z
+Broadcasting data: oceanographic at 2025-08-23T00:38:02.254Z
+Broadcasting data: vessel at 2025-08-23T00:38:07.235Z
+Broadcasting data: oceanographic at 2025-08-23T00:38:07.254Z
+Broadcasting data: prediction at 2025-08-23T00:38:12.254Z
+Broadcasting data: oceanographic at 2025-08-23T00:38:12.255Z
+ GET /?id=0ab9d060-95f4-4e44-ab28-3cc1b61e5c43&vscodeBrowserReqId=1755908660847 200 in 45ms
+Broadcasting data: oceanographic at 2025-08-23T00:38:17.256Z
+Broadcasting data: alert at 2025-08-23T00:38:22.230Z
+Broadcasting data: vessel at 2025-08-23T00:38:22.235Z
+Broadcasting data: prediction at 2025-08-23T00:38:22.254Z
+Broadcasting data: oceanographic at 2025-08-23T00:38:22.255Z
+ ⚠ Cross origin request detected from 3000-zyztek-sardinai-oouh6wczx3h.ws-us121.gitpod.io to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+Broadcasting data: oceanographic at 2025-08-23T00:38:27.256Z
+Broadcasting data: prediction at 2025-08-23T00:38:32.255Z
+Broadcasting data: oceanographic at 2025-08-23T00:38:32.257Z
+Broadcasting data: vessel at 2025-08-23T00:38:37.237Z
+Broadcasting data: oceanographic at 2025-08-23T00:38:37.256Z
+Broadcasting data: prediction at 2025-08-23T00:38:42.257Z
+Broadcasting data: oceanographic at 2025-08-23T00:38:42.257Z
+Broadcasting data: oceanographic at 2025-08-23T00:38:47.259Z
+Broadcasting data: alert at 2025-08-23T00:38:52.232Z
+Broadcasting data: vessel at 2025-08-23T00:38:52.237Z
+Broadcasting data: prediction at 2025-08-23T00:38:52.257Z
+Broadcasting data: oceanographic at 2025-08-23T00:38:52.259Z
+Broadcasting data: oceanographic at 2025-08-23T00:38:57.260Z
+Broadcasting data: prediction at 2025-08-23T00:39:02.259Z
+Broadcasting data: oceanographic at 2025-08-23T00:39:02.260Z
+t 2025-08-23T00:38:57.260Z
+Broadcasting data: prediction at 2025-08-23T00:39:02.259Z
+Broadcasting data: oceanographic at 2025-08-23T00:39:02.260Z
