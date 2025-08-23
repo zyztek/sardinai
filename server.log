@@ -1,8 +1,52 @@
- ⨯ uncaughtException:  Error: listen EADDRINUSE: address already in use 0.0.0.0:3000
-    at <unknown> (Error: listen EADDRINUSE: address already in use 0.0.0.0:3000) {
-  code: 'EADDRINUSE',
-  errno: -98,
-  syscall: 'listen',
-  address: '0.0.0.0',
-  port: 3000
-}
+> Ready on http://0.0.0.0:3000
+> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
+Broadcasting data: oceanographic at 2025-08-23T00:52:47.970Z
+Broadcasting data: prediction at 2025-08-23T00:52:52.968Z
+Broadcasting data: oceanographic at 2025-08-23T00:52:52.970Z
+Broadcasting data: vessel at 2025-08-23T00:52:57.970Z
+Broadcasting data: oceanographic at 2025-08-23T00:52:57.971Z
+Broadcasting data: prediction at 2025-08-23T00:53:02.969Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:02.972Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:07.974Z
+Broadcasting data: prediction at 2025-08-23T00:53:12.969Z
+Broadcasting data: vessel at 2025-08-23T00:53:12.971Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:12.974Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:17.978Z
+Broadcasting data: prediction at 2025-08-23T00:53:22.974Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:22.978Z
+Broadcasting data: vessel at 2025-08-23T00:53:27.974Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:27.978Z
+Broadcasting data: prediction at 2025-08-23T00:53:32.979Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:32.979Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:37.981Z
+Broadcasting data: vessel at 2025-08-23T00:53:42.974Z
+Broadcasting data: prediction at 2025-08-23T00:53:42.978Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:42.980Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:47.982Z
+Broadcasting data: prediction at 2025-08-23T00:53:52.979Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:52.982Z
+Broadcasting data: vessel at 2025-08-23T00:53:57.975Z
+Broadcasting data: oceanographic at 2025-08-23T00:53:57.982Z
+Broadcasting data: prediction at 2025-08-23T00:54:02.982Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:02.982Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:07.987Z
+Broadcasting data: vessel at 2025-08-23T00:54:12.979Z
+Broadcasting data: prediction at 2025-08-23T00:54:12.982Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:12.986Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:17.992Z
+Broadcasting data: prediction at 2025-08-23T00:54:22.987Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:22.991Z
+Broadcasting data: vessel at 2025-08-23T00:54:27.982Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:27.992Z
+Broadcasting data: prediction at 2025-08-23T00:54:32.990Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:32.992Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:37.996Z
+Broadcasting data: alert at 2025-08-23T00:54:42.981Z
+Broadcasting data: vessel at 2025-08-23T00:54:42.983Z
+Broadcasting data: prediction at 2025-08-23T00:54:42.990Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:42.995Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:48.000Z
+Broadcasting data: prediction at 2025-08-23T00:54:52.994Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:53.000Z
+prediction at 2025-08-23T00:54:52.994Z
+Broadcasting data: oceanographic at 2025-08-23T00:54:53.000Z
